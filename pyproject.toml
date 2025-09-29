@@ -1,6 +1,6 @@
 [project]
 name = "ai-organizational-changes"
-version = "0.1.0"
+version = "1.0.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -21,3 +21,10 @@ ai-organizational-changes = "ai_organizational_changes:main"
 [build-system]
 requires = ["uv_build>=0.8.22,<0.9.0"]
 build-backend = "uv_build"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "uv"
+update_changelog_on_bump = true
