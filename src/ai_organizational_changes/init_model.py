@@ -1,0 +1,49 @@
+"""Utils for initialization of Gemini."""
+
+from dotenv import load_dotenv
+from pydantic_ai import Agent
+import os
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
+
+from pydantic_ai.models.google import GoogleModelSettings
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from ai_organizational_changes.model import JobReplacementPrediction
+
+load_dotenv(override=True)
+
+
+def init_openrouter_agent(
+    system_prompt: str = "", model_name: str = "gpt5-chat"
+) -> Agent[None, JobReplacementPrediction]:
+    model = OpenAIChatModel(
+        model_name=model_name,
+        provider=OpenAIProvider(
+            api_key=os.getenv(key="OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+        ),
+    )
+    return Agent(
+        model=model, system_prompt=system_prompt, output_type=JobReplacementPrediction
+    )
+
+
+def init_gemini_agent(
+    system_prompt: str = "",
+    thinking_budget: int = 200,
+    temperature: float = 1,
+    model_name: str = "gemini-2.5-flash",
+) -> Agent[None, JobReplacementPrediction]:
+    provider = GoogleProvider(api_key=os.getenv("GEMINI_API_KEY"))
+
+    settings = GoogleModelSettings(
+        temperature=temperature,
+        google_thinking_config={"thinking_budget": thinking_budget},
+    )
+    model = GoogleModel(model_name=model_name, provider=provider, settings=settings)
+    agent = Agent(
+        model=model, system_prompt=system_prompt, output_type=JobReplacementPrediction
+    )
+
+    return agent
