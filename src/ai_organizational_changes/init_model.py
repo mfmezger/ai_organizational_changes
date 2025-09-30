@@ -32,7 +32,7 @@ def init_openrouter_agent(
 def init_gemini_agent(
     system_prompt: str = "",
     thinking_budget: int = 200,
-    temperature: float = 1,
+    temperature: float = 0.3,  # 0..7
     model_name: str = "gemini-2.5-flash",
 ) -> Agent[None, JobReplacementPrediction]:
     provider = GoogleProvider(api_key=os.getenv("GEMINI_API_KEY"))
