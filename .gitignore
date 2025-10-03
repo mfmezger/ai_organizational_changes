@@ -207,3 +207,4 @@ marimo/_lsp/
 __marimo__/
 ai_organizational_changes_results.json
 ai_organizational_changes_results.xlsx
+results/

@@ -1,24 +1,29 @@
-from ai_organizational_changes.init_model import init_gemini_agent
+from ai_organizational_changes.init_model import init_cohere_agent
 
 import pandas as pd
 import json
 import asyncio
 from datetime import datetime
 from loguru import logger
-from tenacity import retry, wait_exponential, retry_if_exception_type
 from tqdm import tqdm
+from pathlib import Path
+import os
+import logfire
 
-system_prompt = """Based on what you know, can you please read the following role and predict which roles are likely to be replaced by generative AI and which skills specifically for the role will be replaced by generative AI"""
+# configure logfire
+logfire.configure(token=os.getenv(key="LOGFIRE_TOKEN"))
+logfire.instrument_pydantic_ai()
 
 
-@retry(
-    wait=wait_exponential(multiplier=1, min=4, max=10),
-    retry=retry_if_exception_type((Exception,)),
-    reraise=True,
-)
-async def process_job(
-    google_agent, job: str, semaphore: asyncio.Semaphore
-) -> dict | None:
+system_prompt = """Based on what you know, can you please read the following role and predict which roles are likely to be impacted by generative AI and which skills specifically for the role will be impacted by generative AI"""
+
+
+# @retry(
+#     wait=wait_exponential(multiplier=1, min=4, max=10),
+#     retry=retry_if_exception_type((Exception,)),
+#     reraise=True,
+# )
+async def process_job(agent, job: str, semaphore: asyncio.Semaphore) -> dict | None:
     """Process a single job with retry logic."""
     job = job.strip()
     if not job:
@@ -29,12 +34,12 @@ async def process_job(
             # Convert run_sync to async call - assuming the agent has an async method
             # If not, we'll need to run it in a thread executor
             try:
-                google_response = await google_agent.run(f"Job:\n{job}")
+                google_response = await agent.run(f"Job:\n{job}")
             except AttributeError:
                 # Fallback to sync method in thread executor if async method doesn't exist
                 loop = asyncio.get_event_loop()
                 google_response = await loop.run_in_executor(
-                    None, google_agent.run_sync, f"Job:\n{job}"
+                    None, agent.run_sync, f"Job:\n{job}"
                 )
 
             # Add job name to the response data
@@ -47,12 +52,22 @@ async def process_job(
 
 
 async def main() -> None:
-    google_agent = init_gemini_agent(system_prompt=system_prompt)
-    # openrouter_agent = init_openrouter_agent(system_prompt=system_prompt)
+    model_name = "command-a-reasoning"
+
+    # agent = init_gemini_agent(system_prompt=system_prompt, temperature=0.3, model_name=model_name)
+    # agent = init_openrouter_agent(
+    #     system_prompt=system_prompt,
+    #     model_name=model_name,
+    #     temperature=0.3,
+    # )
+
+    agent = init_cohere_agent(
+        system_prompt=system_prompt, temperature=0.3, model_name=model_name
+    )
     # Use the agents for your tasks
 
     # Load the data from jobs.txt and every new line is a new job
-    with open("jobs.txt") as f:
+    with Path("jobs.txt").open() as f:
         jobs = f.readlines()
 
     # Filter out empty jobs
@@ -67,7 +82,7 @@ async def main() -> None:
 
     # Process all jobs concurrently using asyncio.gather with progress bar
     try:
-        tasks = [process_job(google_agent, job, semaphore) for job in jobs]
+        tasks = [process_job(agent=agent, job=job, semaphore=semaphore) for job in jobs]
 
         # Use tqdm to wrap asyncio.gather for progress tracking
         results = []
@@ -98,15 +113,18 @@ async def main() -> None:
             # Generate timestamp for filenames
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
+            # save the results in a folder named results
+            Path("results").mkdir(exist_ok=True)
+
             # Save all results as a single JSON file with timestamp
-            json_filename = f"ai_organizational_changes_results_{timestamp}.json"
-            with open(json_filename, "w") as f:
-                json.dump(all_results, f, indent=2)
+            json_filename = f"results/{model_name.replace('/', '_')}_{timestamp}.json"
+            with Path(json_filename).open(mode="w") as f:
+                json.dump(obj=all_results, fp=f, indent=2)
 
             # Save all results as a single Excel file with each job as one row
-            excel_filename = f"ai_organizational_changes_results_{timestamp}.xlsx"
-            df = pd.json_normalize(all_results)
-            df.to_excel(excel_filename, index=False)
+            excel_filename = f"results/{model_name.replace('/', '_')}_{timestamp}.xlsx"
+            df = pd.json_normalize(data=all_results)
+            df.to_excel(excel_writer=excel_filename, index=False)
 
             logger.info(f"Results saved to {json_filename} and {excel_filename}")
         else:
@@ -118,4 +136,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main=main())
