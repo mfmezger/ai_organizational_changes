@@ -1,4 +1,4 @@
-from ai_organizational_changes.init_model import init_cohere_agent
+from ai_organizational_changes.init_model import init_openrouter_agent
 
 import pandas as pd
 import json
@@ -52,19 +52,18 @@ async def process_job(agent, job: str, semaphore: asyncio.Semaphore) -> dict | N
 
 
 async def main() -> None:
-    model_name = "command-a-reasoning"
+    model_name = "openai/gpt-5"
 
     # agent = init_gemini_agent(system_prompt=system_prompt, temperature=0.3, model_name=model_name)
-    # agent = init_openrouter_agent(
-    #     system_prompt=system_prompt,
-    #     model_name=model_name,
-    #     temperature=0.3,
-    # )
-
-    agent = init_cohere_agent(
-        system_prompt=system_prompt, temperature=0.3, model_name=model_name
+    agent = init_openrouter_agent(
+        system_prompt=system_prompt,
+        model_name=model_name,
+        temperature=0.3,
     )
-    # Use the agents for your tasks
+
+    # agent = init_cohere_agent(
+    #     system_prompt=system_prompt, temperature=0.3, model_name=model_name
+    # )
 
     # Load the data from jobs.txt and every new line is a new job
     with Path("jobs.txt").open() as f:

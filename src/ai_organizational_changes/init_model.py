@@ -56,7 +56,7 @@ def init_gemini_agent(
     temperature: float = 0.3,  # 0..7
     model_name: str = "gemini-2.5-flash",
 ) -> Agent[None, JobReplacementPrediction]:
-    provider = GoogleProvider(api_key=os.getenv("GEMINI_API_KEY"))
+    provider = GoogleProvider(api_key=os.getenv(key="GEMINI_API_KEY"))  # pyright: ignore[reportArgumentType]
 
     settings = GoogleModelSettings(
         temperature=temperature,
