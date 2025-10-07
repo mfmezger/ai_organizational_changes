@@ -1,3 +1,9 @@
+## 3.1.0 (2025-10-07)
+
+### Feat
+
+- **main,-init_model,-readme**: Updateing defaults to openrouter agent
+
 ## 3.0.0 (2025-10-03)
 
 ### Feat
