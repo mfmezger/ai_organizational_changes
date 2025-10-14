@@ -2,7 +2,7 @@
 
 ### Feat
 
-- **main,-init_model,-readme**: Updateing defaults to openrouter agent
+- **main,-init_model,-readme**: Updating defaults to openrouter agent
 
 ## 3.0.0 (2025-10-03)
 

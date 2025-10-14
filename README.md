@@ -1,7 +1,17 @@
 # AI Organizational Changes
 
-
 ## Description
+This repository contains code to analyze organizational changes using AI models.
+
+
+**Table of Contents:**
+- [AI Organizational Changes](#ai-organizational-changes)
+  - [Description](#description)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Monitoring](#monitoring)
+
+
 
 
 ## Installation
@@ -30,6 +40,13 @@ You can choose different LLM Providers already integrated are:
 - OpenRouter (you can basically use every model via openrouter)
 
 Choose the correct provider you want in the ```main.py``` file lines 57-66. As default OpenRouter with OpenAIs GPT-5 is set.
+
+```python
+ai_organizational_changes
+    ├── init_model.py # methods to initialize the models: OpenRouter, Cohere, Gemini
+    ├── main.py # Main loop for async execution of the queries.
+    └── model.py # Definition of the Output Format for the models.
+````
 
 ## Monitoring
 
