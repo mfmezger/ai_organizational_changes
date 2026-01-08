@@ -58,7 +58,7 @@ async def main() -> None:
     agent = init_openrouter_agent(
         system_prompt=system_prompt,
         model_name=model_name,
-        temperature=0.3,
+        temperature=0,
     )
 
     # agent = init_cohere_agent(
