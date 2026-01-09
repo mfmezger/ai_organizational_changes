@@ -21,7 +21,7 @@ MODELS: list[str] = [
     "anthropic/claude-4.5-sonnet",
     "google/gemini-3-flash-preview",
     "x-ai/grok-4",
-    "command-a-reasoning-08-2025"
+    "command-a-reasoning-08-2025",
 ]
 
 
@@ -40,15 +40,7 @@ async def process_job(
         retry_delay = 10  # Start with 10 seconds
         for attempt in range(max_retries):
             try:
-
-                try:
-                    response = await agent.run(f"Job:\n{job}")
-                except AttributeError:
-                    # Fallback to sync method in thread executor if async method doesn't exist
-                    loop = asyncio.get_event_loop()
-                    response = await loop.run_in_executor(
-                        None, agent.run_sync, f"Job:\n{job}"
-                    )
+                response = await agent.run(f"Job:\n{job}")
 
                 # Add job name to the response data
                 response_data = response.output.model_dump()
