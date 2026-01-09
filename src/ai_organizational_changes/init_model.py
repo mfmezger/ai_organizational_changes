@@ -1,19 +1,19 @@
-"""Utils for initialization of Gemini."""
+"""Utils for initialization of LLM agents."""
 
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 import os
-from pydantic_ai.models.google import GoogleModel
-from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.models.cohere import CohereModel, CohereModelSettings
 from pydantic_ai.providers.cohere import CohereProvider
-from pydantic_ai.models.google import GoogleModelSettings
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from ai_organizational_changes.model import JobReplacementPrediction
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 
 load_dotenv(override=True)
+
+# Providers that require their own SDK (not OpenRouter)
+COHERE_PREFIXES = ("cohere/", "command-")
 
 
 def init_openrouter_agent(
@@ -39,7 +39,8 @@ def init_openrouter_agent(
         ),
         settings=OpenAIResponsesModelSettings(
             # openai_reasoning_effort="low",
-            temperature=temperature
+            temperature=temperature,
+            max_tokens=4096,  # Limit tokens to avoid credit issues with expensive models
         ),
     )
     return Agent(
@@ -50,40 +51,55 @@ def init_openrouter_agent(
     )
 
 
-def init_gemini_agent(
-    system_prompt: str = "",
-    thinking_budget: int = 200,
-    temperature: float = 0.3,  # 0..7
-    model_name: str = "gemini-2.5-flash",
-) -> Agent[None, JobReplacementPrediction]:
-    provider = GoogleProvider(api_key=os.getenv(key="GEMINI_API_KEY"))  # pyright: ignore[reportArgumentType]
-
-    settings = GoogleModelSettings(
-        temperature=temperature,
-        google_thinking_config={"thinking_budget": thinking_budget},
-    )
-    model = GoogleModel(model_name=model_name, provider=provider, settings=settings)
-    agent = Agent(
-        model=model, system_prompt=system_prompt, output_type=JobReplacementPrediction
-    )
-
-    return agent
-
-
 def init_cohere_agent(
     system_prompt: str = "",
-    thinking_budget: int = 200,
-    temperature: float = 0.3,  # 0..7
-    model_name: str = "gemini-2.5-flash",
+    temperature: float = 0.3,
+    model_name: str = "command-r-plus",
 ) -> Agent[None, JobReplacementPrediction]:
     """Initialize a Cohere agent."""
+    # Strip cohere/ prefix if present
+    if model_name.startswith("cohere/"):
+        model_name = model_name.replace("cohere/", "")
 
     model = CohereModel(
         model_name=model_name,
         provider=CohereProvider(api_key=os.getenv("COHERE_API_KEY")),
         settings=CohereModelSettings(temperature=temperature),
     )
-    agent = Agent(
-        model=model, system_prompt=system_prompt, output_type=JobReplacementPrediction
-    )  # Add other parameters as needed
-    return agent
+    return Agent(
+        model=model,
+        system_prompt=system_prompt,
+        output_type=JobReplacementPrediction,
+        retries=10,
+    )
+
+
+def init_agent(
+    system_prompt: str = "",
+    model_name: str = "openai/gpt-4o",
+    temperature: float = 0.3,
+) -> Agent[None, JobReplacementPrediction]:
+    """Unified agent factory that routes to the appropriate provider.
+
+    Args:
+        system_prompt: The system prompt for the LLM.
+        model_name: Name of the model. Use 'cohere/' prefix for Cohere models.
+        temperature: Controls the randomness of the output.
+
+    Returns:
+        Agent configured for the specified model.
+    """
+    # Check if this is a Cohere model
+    if model_name.startswith(COHERE_PREFIXES):
+        return init_cohere_agent(
+            system_prompt=system_prompt,
+            model_name=model_name,
+            temperature=temperature,
+        )
+
+    # Default to OpenRouter for all other models
+    return init_openrouter_agent(
+        system_prompt=system_prompt,
+        model_name=model_name,
+        temperature=temperature,
+    )
