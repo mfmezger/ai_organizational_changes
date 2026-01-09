@@ -19,7 +19,7 @@ COHERE_PREFIXES = ("cohere/", "command-")
 def init_openrouter_agent(
     system_prompt: str = "",
     model_name: str = "gpt5-chat",
-    temperature=0.3,
+    temperature=0.0,
 ) -> Agent[None, JobReplacementPrediction]:
     """Initialize an OpenRouter agent.
 
@@ -53,7 +53,7 @@ def init_openrouter_agent(
 
 def init_cohere_agent(
     system_prompt: str = "",
-    temperature: float = 0.3,
+    temperature: float = 0.0,
     model_name: str = "command-r-plus",
 ) -> Agent[None, JobReplacementPrediction]:
     """Initialize a Cohere agent."""
@@ -77,7 +77,7 @@ def init_cohere_agent(
 def init_agent(
     system_prompt: str = "",
     model_name: str = "openai/gpt-4o",
-    temperature: float = 0.3,
+    temperature: float = 0.0,
 ) -> Agent[None, JobReplacementPrediction]:
     """Unified agent factory that routes to the appropriate provider.
 
