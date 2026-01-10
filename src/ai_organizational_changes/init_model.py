@@ -66,7 +66,7 @@ def init_cohere_agent(
     model = CohereModel(
         model_name=model_name,
         provider=CohereProvider(api_key=os.getenv("COHERE_API_KEY")),
-        settings=CohereModelSettings(temperature=temperature, p=0),
+        settings=CohereModelSettings(temperature=temperature, p=0, seed=121),
     )
     return Agent(
         model=model,
