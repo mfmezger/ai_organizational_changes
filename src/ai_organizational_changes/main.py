@@ -10,9 +10,13 @@ from pathlib import Path
 import os
 import logfire
 
-# configure logfire
-logfire.configure(token=os.getenv(key="LOGFIRE_TOKEN"))
+# configure logfire with verbose console logging
+logfire.configure(
+    token=os.getenv(key="LOGFIRE_TOKEN"),
+    console=logfire.ConsoleOptions(verbose=True),  # Show full requests in terminal
+)
 logfire.instrument_pydantic_ai()
+logfire.instrument_httpx(capture_all=True)  # Show full HTTP request/response bodies
 
 
 # List of models to process
@@ -20,6 +24,7 @@ MODELS: list[str] = [
     "openai/gpt-5",
     "anthropic/claude-4.5-sonnet",
     "google/gemini-3-flash-preview",
+    "google/gemini-2.5-pro",
     "x-ai/grok-4",
     "command-a-reasoning-08-2025",
 ]
@@ -29,7 +34,10 @@ system_prompt = """Based on what you know, can you please read the following rol
 
 
 async def process_job(
-    agent, job: str, semaphore: asyncio.Semaphore, max_retries: int = 5
+    agent,
+    job: str,
+    semaphore: asyncio.Semaphore,
+    max_retries: int = 5,
 ) -> dict | None:
     """Process a single job with retry logic for rate limits."""
     job = job.strip()

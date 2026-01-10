@@ -40,6 +40,8 @@ def init_openrouter_agent(
         settings=OpenAIResponsesModelSettings(
             # openai_reasoning_effort="low",
             temperature=temperature,
+            top_p=0,
+            seed=121,
             max_tokens=4096,  # Limit tokens to avoid credit issues with expensive models
         ),
     )
@@ -64,7 +66,7 @@ def init_cohere_agent(
     model = CohereModel(
         model_name=model_name,
         provider=CohereProvider(api_key=os.getenv("COHERE_API_KEY")),
-        settings=CohereModelSettings(temperature=temperature),
+        settings=CohereModelSettings(temperature=temperature, p=0),
     )
     return Agent(
         model=model,
