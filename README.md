@@ -1,4 +1,4 @@
-# AI Organizational Changes
+# AI Organizational Design
 
 ## Description
 This repository contains code to analyze organizational changes using AI models.
