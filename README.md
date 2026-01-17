@@ -232,14 +232,14 @@ Running AI models via API costs money. Here's a breakdown of what to expect.
 
 ### Cost Per Model (Approximate)
 
-Prices vary by model and provider. These are **estimates** based on OpenRouter pricing (as of 2024):
+Prices vary by model and provider. These are **estimates** based on OpenRouter pricing (as of model execution time in 2026):
 
 | Model | Input $/1M tokens | Output $/1M tokens | Est. Cost (510 calls) |
 |-------|-------------------|--------------------|-----------------------|
-| GPT-5 | $5.00 | $15.00 | ~$1.50 - $3.00 |
+| GPT-5 | $1.25 | $10.00 | ~$1.50 - $2.00 |
 | Claude 4.5 Sonnet | $3.00 | $15.00 | ~$1.00 - $2.50 |
-| Gemini 2.5 Pro | $1.25 | $5.00 | ~$0.40 - $0.80 |
-| Gemini 3 Flash | $0.10 | $0.40 | ~$0.03 - $0.06 |
+| Gemini 2.5 Pro | $1.25 | $10.00 | ~$1.50 - $2.00 |
+| Gemini 3 Flash | $0.50 | $3.00 | ~$0.40 - $0.60 |
 | Grok 4 | $3.00 | $15.00 | ~$1.00 - $2.50 |
 | Cohere Command | $2.50 | $10.00 | ~$0.80 - $1.50 |
 
@@ -247,9 +247,9 @@ Prices vary by model and provider. These are **estimates** based on OpenRouter p
 
 | Scenario | Cost |
 |----------|------|
-| **All 6 models, 85 jobs** | **~$5 - $12** |
-| Only cheap models (Gemini Flash) | ~$0.05 |
-| Only expensive models (GPT-5, Claude) | ~$3 - $6 |
+| **All 6 models, 85 jobs** | **~$8 - $11** |
+| Only cheap models (Gemini Flash) | ~$0.50 |
+| Only expensive models (GPT-5, Claude) | ~$3 - $5 |
 
 ### Cost Formula
 
