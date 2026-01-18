@@ -6,17 +6,17 @@
 
 ### 📚 Background
 
-Artificial intelligence has been rapidly increasing in sophistication and impact, reinforcing discussions of its extensive potential to disrupt individual jobs and organizations. Through our investigation into the disruptive potential of generative artificial intelligence (genAI) on organizations, we don't just study genAI — **we also team up with it**.
+Artificial intelligence has been rapidly increasing in sophistication and impact, reinforcing discussions of its extensive potential to disrupt individual jobs and organizations. Through our investigation into the disruptive potential of generative artificial intelligence (genAI) on organizations, we don't just study genAI — **we also collaborate with it**.
 
-We consolidated data from the **O*Net 2023 database** to create a list of **85 corporate knowledge worker roles** (and associated skill levels). Then, together with **five different genAI team members**, we assessed which roles AI will automate or augment (human with AI) in the near future.
+We consolidated data from the **O*Net 2023 database** to create a list of **85 corporate knowledge worker roles** (and associated skill levels). Then, together with **five different genAI models**, we assessed which roles AI will automate or augment (human with AI) in the near future.
 
 ---
 
 ## 🤔 Why use LLMs for This? Are they reliable?
 
-A fair question: *"Can we trust AI to judge which jobs will be affected by AI?"*
+A valid question: *"Can we trust AI to judge which jobs will be affected by AI?"*
 
-Short answer: **Yes, and here's why.**
+Short answer: **Yes, for the following reasons.**
 
 ### The Problem with Human Coders
 
@@ -35,8 +35,9 @@ To combat this, researchers typically use **multiple coders** and measure **inte
 
 > **Gwet, K., (2001)** Handbook of inter-rater reliability. Gaithersburg, MD: STATAXIS Publishing Company, pp.223-246.
 
-Cronbach alpha is not a suitable metric for this as it is designed for measuring reliability of items (questions of a questionnaire): "A n y research based on measurement must be concerned with the
-accuracy or dependability or, as we usually call it, reliability of measurement. A reliability coefficient demonstrates whether the test designer was correct in expecting a certain collection of items to yield interpretable statements about individual differences (25)." Cronbach (1951), p.1
+Cronbach alpha is not a suitable metric for this as it is designed for measuring reliability of items (questions of a questionnaire):
+
+> "Any research based on measurement must be concerned with the accuracy or dependability or, as we usually call it, reliability of measurement. A reliability coefficient demonstrates whether the test designer was correct in expecting a certain collection of items to yield interpretable statements about individual differences (25)." Cronbach (1951), p.1
 
 > **Cronbach, L.J. (1951)** Coefficient alpha and the internal structure of tests. Psychometrika 16, 297–334 (1951). https://doi.org/10.1007/BF02310555
 
@@ -58,20 +59,20 @@ Recent research has shown that Large Language Models actually **outperform human
 | ✅ **Multiple "coders"** | We use 5-6 different models as independent raters |
 | ✅ **Transparent process** | The exact prompt and parameters are documented |
 
-### But wait — Isn't this circular?
+### Methodological Consideration: Potential Bias
 
 You might wonder: *"Using AI to predict AI's impact on jobs... isn't that biased?"*
 
-**Actually, no.** Here's why:
+**This is not the case.** Here's why:
 
 1. **LLMs are trained on human knowledge** — they reflect collective human understanding of jobs and automation
 2. **We use multiple models** — if GPT-5, Claude, and Gemini all agree, that's like having 5 expert coders agree
 3. **Results are transparent** — you can see exactly what each model said and why
-4. **It's a prediction, not a fact** — we're measuring AI's *assessment*, which is the research question itself
+4. **It is a prediction, not a fact** — we are measuring AI's *assessment*, which is the research question itself
 
-### The meta-twist 🌀
+### Methodological Approach
 
-There's actually something beautiful here: **we're using human-AI collaboration to study human-AI collaboration**. The research method mirrors the research topic — AI and humans working together to understand how AI and humans will work together.
+This research employs human-AI collaboration to study human-AI collaboration. The research method mirrors the research topic — AI and humans working together to understand how AI and humans will work together.
 
 > 📖 *References:*
 > - *Tai, R. H., Bentley, L. R., Xia, X., Sitt, J. M., Fankhauser, S. C., Chicas-Mosier, A. M., & Monteith, B. G. (2024). An Examination of the Use of Large Language Models to Aid Analysis of Textual Data. International Journal of Qualitative Methods, 23. https://doi.org/10.1177/16094069241231168*
@@ -120,41 +121,63 @@ Instead of chatting, we write **code** that:
 
 ### How our prompt is constructed
 
-The prompt lives in `main.py` line 33:
+The prompt construction involves two key components:
+
+#### 1. System Prompt
+
+The system prompt is defined in `main.py` line 33:
 
 ```python
-system_prompt = """Based on what you know, can you please read the following 
-role and predict which roles are likely to be impacted by generative AI 
+system_prompt = """Based on what you know, can you please read the following
+role and predict which roles are likely to be impacted by generative AI
 and which skills specifically for the role will be impacted by generative AI"""
 ```
 
-This **system prompt** sets the AI's behavior. Then, for each job, we send:
+#### 2. Model Docstring (Automatic)
+
+The Pydantic AI framework automatically includes the docstring from the `JobReplacementPrediction` model in the prompt. This docstring provides detailed instructions about the expected output format and field definitions:
+
+```python
+class JobReplacementPrediction(BaseModel):
+    """Model for job replacement prediction.
+
+    Attributes:
+        job_title (str): The title of the job.
+        genai_impact (bool): Whether the job is likely to be automated by AI. Automation means that machines take over a human task. Whether the job is likely to be augmented with AI. Augmentation means that Humans collaborate closely with machines to perform a task. Whether the job is likely to remain human-only.
+        skills (list[str]): List of skills that the genai takes over completely.
+        explanation (str): Explanation for the prediction. Maximum 100 words.
+    """
+```
+
+This **docstring** provides context and definitions for the structured output, ensuring consistent interpretation across different AI models.
+
+#### Complete Prompt Structure
+
+When processing a job, the AI receives the combined instruction: system prompt + model docstring + job input.
 
 ```python
 response = await agent.run(f"Job:\n{job}")
 ```
 
-So if the job is "Accountant", the AI receives:
-```
-Job:
-Accountant
-```
+If the job is "Accountant", the AI receives the complete context: system instructions, output format specifications, and the job title itself.
 
 ### The Magic: Structured output (No more rambling!)
 
-Here's where it gets interesting. In `model.py`, we define **exactly** what the AI must return:
+In `model.py`, we define **exactly** what the AI must return using a Pydantic model:
 
 ```python
 class JobReplacementPrediction(BaseModel):
     job_title: str
     genai_impact: Literal[
-        "likely_automated_by_ai", 
-        "likely_augmented_with_ai", 
+        "likely_automated_by_ai",
+        "likely_augmented_with_ai",
         "likely_human_only"
     ]
     skills: list[str]
     explanation: str
 ```
+
+The full model definition includes a comprehensive docstring that explains each field's meaning and purpose (see `model.py` lines 6-13). This docstring, along with the system prompt, is automatically included in the instruction sent to each AI model, ensuring consistent interpretation and output formatting across all models.
 
 This means the AI **cannot** respond with:
 
@@ -171,7 +194,7 @@ Instead, it **must** return a structured object like:
 }
 ```
 **Example output (disclaimer: everything is genAI generated except the first column):**
-| job_title | enai_impact | skills | explanation | job |
+| job_title | genai_impact | skills | explanation | job |
 |:---|:---|:---|:---|:---|
 | Accountant | likely_augmented | ['Data entry', 'Financial analysis'] | Generative AI is likely to augment the roles of accountants and auditors by automating repetitive tasks such as data entry, bookkeeping, and routine financial analysis. This technology can also assist in drafting financial reports, reducing the time spent on these activities. However, the need for human oversight in complex decision-making, ethical judgments, and client interactions will remain crucial. Accountants and auditors will increasingly need to develop skills in AI literacy, data interpretation, and strategic advisory to complement AI capabilities. | Accountant |
 
@@ -179,13 +202,13 @@ Instead, it **must** return a structured object like:
 
 | Aspect | ChatGPT Website | Our Programmatic Approach |
 |--------|-----------------|---------------------------|
-| **Reproducibility** | ❌ Can't prove what you asked | ✅ Code is the proof |
+| **Reproducibility** | ❌ Cannot prove what was asked | ✅ Code is the proof |
 | **Consistency** | ❌ Different phrasing = different results | ✅ Exact same prompt every time |
-| **Scalability** | ❌ 425 manual queries? LOL | ✅ Runs overnight automatically |
+| **Scalability** | ❌ 425 manual queries impractical | ✅ Runs overnight automatically |
 | **Structure** | ❌ Free-form text, must parse by hand | ✅ JSON, directly into Excel |
 | **Temperature control** | ❌ Hidden, changes randomly | ✅ Set to 0 for determinism |
 | **Multi-model comparison** | ❌ Switch tabs, retype everything | ✅ Loop through 5 models automatically |
-| **Rate limit handling** | ❌ "Try again later" 😤 | ✅ Automatic retry with backoff |
+| **Rate limit handling** | ❌ "Rate limit exceeded" | ✅ Automatic retry with backoff |
 | **Logging** | ❌ Hope you copied it somewhere | ✅ Logfire records everything |
 
 ### The Temperature Setting
@@ -208,7 +231,7 @@ For scientific research, we want **reproducibility**, so we use 0.
 
 > 📖 *See: Renze, M. (2024, November). The Effect of Sampling Temperature on Problem Solving in Large Language Models. In Y. Al-Onaizan, M. Bansal, & Y.-N. Chen, Findings of the Association for Computational Linguistics: EMNLP 2024, Miami, Florida, USA.*
 
-### TL;DR: Why Code > ChatGPT for Research
+### Summary: Advantages of Programmatic Approach
 
 🎯 **Precision**: We control exactly what we ask  
 🔁 **Reproducibility**: Anyone can run the same code, get same results  
@@ -219,8 +242,8 @@ For scientific research, we want **reproducibility**, so we use 0.
 
 ## 💰 Cost calculation: What does this cost?
 
-Running AI models via API costs money. Here's a breakdown of what to expect.
-Disclaimer: We repeated the runs because a new genAI model from Google was deployed during the ongoing research acitivities. Therefore six models are depicted in the following. Five models are reflected in the associated paper.
+Running AI models via API costs money. The following section provides a cost breakdown.
+Disclaimer: We repeated the runs because a new genAI model from Google was deployed during the ongoing research activities. Therefore six models are depicted in the following. Five models are reflected in the associated paper.
 
 ### Number of API Requests
 
@@ -269,13 +292,6 @@ For 510 calls with ~300 tokens average:
 Total Tokens ≈ 510 × 300 = 153,000 tokens per model
 ```
 
-### Tips to reduce costs
-
-- 🧪 **Test with one model first** before running all 6
-- 💨 **Use Gemini Flash** for testing — it's nearly free
-- 📉 **Reduce job list** — test with 10 jobs before running 85
-- 🔁 **Don't re-run unnecessarily** — results are saved to `results/`
-
 > ⚠️ **Note:** Prices change frequently! Check [OpenRouter pricing](https://openrouter.ai/models) or individual provider websites for current rates.
 
 ---
@@ -284,29 +300,21 @@ Total Tokens ≈ 510 × 300 = 153,000 tokens per model
 
 ### Step 1: Install UV
 
-UV is a program that installs other programs (like an app store for developers).
+UV is a package manager for Python projects. Install it following the instructions at:
 
-1. Open **PowerShell** (Press Windows key, type "PowerShell", press Enter)
-2. Copy this command and press Enter:
-
-```powershell
-irm https://astral.sh/uv/install.ps1 | iex
-```
-
-3. Close PowerShell and open it again
+https://docs.astral.sh/uv/getting-started/installation/
 
 ### Step 2: Prepare the project
 
-1. Open PowerShell
-2. Navigate to the project folder:
+1. Navigate to the project folder:
 
-```powershell
-cd "D:\Programming Projects\ai_organizational_changes"
+```bash
+cd path/to/ai_organizational_changes
 ```
 
-3. Install all required dependencies:
+2. Install all required dependencies:
 
-```powershell
+```bash
 uv sync
 ```
 
@@ -349,7 +357,7 @@ Jobs are listed in the `jobs.txt` file.
 
 - Each line = one job
 - One job per line
-- Just write the job name
+- Write the job name
 
 ### Example (jobs.txt):
 
@@ -365,16 +373,15 @@ Sales Representative
 
 ## ▶️ Running the program
 
-1. Open PowerShell
-2. Navigate to the project folder:
+1. Navigate to the project folder:
 
-```powershell
-cd "D:\Programming Projects\ai_organizational_changes"
+```bash
+cd path/to/ai_organizational_changes
 ```
 
-3. Start the program:
+2. Start the program:
 
-```powershell
+```bash
 uv run python -m ai_organizational_changes.main
 ```
 
@@ -385,7 +392,7 @@ uv run python -m ai_organizational_changes.main
 3. Each model analyzes every job
 4. The results are saved
 
-**⏱️ This takes a while!** The more jobs and models, the longer it takes. Go grab a coffee ☕
+**⏱️ This takes a while!** The more jobs and models, the longer it takes. This process may take several minutes to complete.
 
 ---
 
@@ -404,7 +411,7 @@ results/
 
 ### Opening the excel file:
 
-You can simply open the `.xlsx` files with Excel. You'll see:
+Open the `.xlsx` files with Excel. The output will display:
 
 | Job | genai_impact | skills | explanation |
 |-----|--------------|--------|-------------|
@@ -438,7 +445,7 @@ MODELS: list[str] = [
 ]
 ```
 
-You can delete or add lines. Search on https://openrouter.ai/models for available models.
+Delete or add lines as needed. Search on https://openrouter.ai/models for available models.
 
 ---
 
@@ -483,4 +490,4 @@ ai_organizational_changes/
 5. **Start the program** → `uv run python -m ai_organizational_changes.main`
 6. **View results in `results/`**
 
-**That's it! You can now make AI predictions for jobs! 🎉**
+**The program is now ready to generate AI predictions for jobs.**
