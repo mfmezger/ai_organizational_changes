@@ -1,32 +1,18 @@
 # 🤖 Accompanying code repository for the paper "Generative AI's Impact on Organizational Design: An Analysis Based on Human-AI Collaboration"
 
-## What does this program even do?
+## What does this program do?
 
-**In short:** This program asks AI models (like ChatGPT, Claude, etc.) which jobs might be affected by AI.
+**In short:** This program asks genAI models (like ChatGPT, Claude, etc.) which jobs might be affected by AI.
 
 ### 📚 Background
 
 Artificial intelligence has been rapidly increasing in sophistication and impact, reinforcing discussions of its extensive potential to disrupt individual jobs and organizations. Through our investigation into the disruptive potential of generative artificial intelligence (genAI) on organizations, we don't just study genAI — **we also team up with it**.
 
-We consolidated data from the **O*Net 2023 database** to create a list of **85 corporate knowledge worker roles** (and associated skill levels). Then, together with **five different genAI team members**, we assessed which roles genAI will automate or augment (human with AI) in the near future.
-
-#### Coding Definitions
-
-- 🔴 **Automated by AI** — Machines take over a human task completely
-- 🟡 **Augmented with AI** — Humans collaborate closely with machines to perform a task
-- 🟢 **Human-only** — The job remains performed by humans without AI involvement
-
-> 📖 *Based on: Raisch, S., & Krakowski, S. (2021). Artificial Intelligence and Management: The Automation-Augmentation Paradox. Academy of Management Review, 46(1), 192–210. https://doi.org/10.5465/amr.2018.0072*
-
-### An Example:
-You give the program a list of jobs (e.g., "Accountant", "Secretary", "Programmer") and the AI tells you:
-- 🔴 **Will be replaced by AI** - The job will probably disappear
-- 🟡 **Will be supported by AI** - Humans will work together with AI
-- 🟢 **Stays human** - The job doesn't need AI
+We consolidated data from the **O*Net 2023 database** to create a list of **85 corporate knowledge worker roles** (and associated skill levels). Then, together with **five different genAI team members**, we assessed which roles AI will automate or augment (human with AI) in the near future.
 
 ---
 
-## 🤔 Why Use LLMs for This? Are They Even Reliable?
+## 🤔 Why use LLMs for This? Are they reliable?
 
 A fair question: *"Can we trust AI to judge which jobs will be affected by AI?"*
 
@@ -43,9 +29,18 @@ Traditional qualitative research uses human coders to categorize data. But human
 | 💭 **Bias** | Personal opinions and experiences influence coding decisions |
 | 📊 **Inconsistency** | The same person might code differently on different days |
 
+### Metric 🌀
+
 To combat this, researchers typically use **multiple coders** and measure **inter-rater reliability** — checking if different humans agree with each other.
 
-### LLMs Are More Consistent Than Humans
+> **Gwet, K., (2001)** Handbook of inter-rater reliability. Gaithersburg, MD: STATAXIS Publishing Company, pp.223-246.
+
+Cronbach alpha is not a suitable metric for this as it is designed for measuring reliability of items (questions of a questionnaire): "A n y research based on measurement must be concerned with the
+accuracy or dependability or, as we usually call it, reliability of measurement. A reliability coefficient demonstrates whether the test designer was correct in expecting a certain collection of items to yield interpretable statements about individual differences (25)." Cronbach (1951), p.1
+
+> **Cronbach, L.J. (1951)** Coefficient alpha and the internal structure of tests. Psychometrika 16, 297–334 (1951). https://doi.org/10.1007/BF02310555
+
+### LLMs are more consistent than humans
 
 Recent research has shown that Large Language Models actually **outperform humans** in consistency:
 
@@ -53,7 +48,7 @@ Recent research has shown that Large Language Models actually **outperform human
 
 > **Gilardi et al. (2023)** found that LLMs offer consistent performance in coding tasks, **outperforming human coders in consistency**. This suggests LLMs as a reliable alternative for qualitative data analysis.
 
-### Why LLMs Work Well for This Task
+### Why LLMs work well for this task
 
 | Advantage | Explanation |
 |-----------|-------------|
@@ -63,7 +58,7 @@ Recent research has shown that Large Language Models actually **outperform human
 | ✅ **Multiple "coders"** | We use 5-6 different models as independent raters |
 | ✅ **Transparent process** | The exact prompt and parameters are documented |
 
-### But Wait — Isn't This Circular?
+### But wait — Isn't this circular?
 
 You might wonder: *"Using AI to predict AI's impact on jobs... isn't that biased?"*
 
@@ -74,7 +69,7 @@ You might wonder: *"Using AI to predict AI's impact on jobs... isn't that biased
 3. **Results are transparent** — you can see exactly what each model said and why
 4. **It's a prediction, not a fact** — we're measuring AI's *assessment*, which is the research question itself
 
-### The Meta-Twist 🌀
+### The meta-twist 🌀
 
 There's actually something beautiful here: **we're using human-AI collaboration to study human-AI collaboration**. The research method mirrors the research topic — AI and humans working together to understand how AI and humans will work together.
 
@@ -82,13 +77,11 @@ There's actually something beautiful here: **we're using human-AI collaboration 
 > - *Tai, R. H., Bentley, L. R., Xia, X., Sitt, J. M., Fankhauser, S. C., Chicas-Mosier, A. M., & Monteith, B. G. (2024). An Examination of the Use of Large Language Models to Aid Analysis of Textual Data. International Journal of Qualitative Methods, 23. https://doi.org/10.1177/16094069241231168*
 > - *Gilardi, F., Alizadeh, M., & Kubli, M. (2023). ChatGPT outperforms crowd workers for text-annotation tasks. Proceedings of the National Academy of Sciences, 120(30), e2305016120. https://doi.org/10.1073/pnas.2305016120*
 
----
-
 ## 🧪 How This Works: Programmatic AI vs. "Chatting with ChatGPT"
 
 This section explains **why we use code to talk to AI models** instead of just typing prompts into ChatGPT like a normal person.
 
-### The Problem with Manual Prompting
+### The problem with manual prompting
 
 When you use ChatGPT through the website, you might type something like:
 
@@ -104,7 +97,7 @@ This has several problems for **scientific research**:
 | ⏱️ **Doesn't scale** | Asking 85 jobs × 5 models = 425 manual questions? No thanks |
 | 🧠 **Human bias** | You might unconsciously phrase questions differently |
 
-### Our Solution: Programmatic Prompting
+### Our solution: Programmatic prompting
 
 Instead of chatting, we write **code** that:
 
@@ -112,8 +105,20 @@ Instead of chatting, we write **code** that:
 2. **Forces structured responses** (not free-form text)
 3. **Logs everything** for reproducibility
 4. **Processes hundreds of jobs automatically**
+---
+### 📚 Design
+---
 
-### How Our Prompt is Constructed
+#### Coding Definitions
+
+- 🔴 **Automated by AI** — Machines take over a human task completely (defined in the programming code as "likely_automated_by_AI")
+- 🟡 **Augmented with AI** — Humans collaborate closely with machines to perform a task (defined in the programming code as "likely_augmented_with_AI")
+- 🟢 **Human-only** — The job remains performed by humans without AI involvement (defined in the programming code as "likely_human_only")
+
+> 📖 *Based on: Raisch, S., & Krakowski, S. (2021). Artificial Intelligence and Management: The Automation-Augmentation Paradox. Academy of Management Review, 46(1), 192–210. https://doi.org/10.5465/amr.2018.0072*
+
+
+### How our prompt is constructed
 
 The prompt lives in `main.py` line 33:
 
@@ -135,7 +140,7 @@ Job:
 Accountant
 ```
 
-### The Magic: Structured Output (No More Rambling!)
+### The Magic: Structured output (No more rambling!)
 
 Here's where it gets interesting. In `model.py`, we define **exactly** what the AI must return:
 
@@ -165,8 +170,12 @@ Instead, it **must** return a structured object like:
   "explanation": "Accountants will use AI for routine tasks but remain essential for judgment calls and client relationships."
 }
 ```
+**Example output (disclaimer: everything is genAI generated except the first column):**
+| job_title | enai_impact | skills | explanation | job |
+|:---|:---|:---|:---|:---|
+| Accountant | likely_augmented | ['Data entry', 'Financial analysis'] | Generative AI is likely to augment the roles of accountants and auditors by automating repetitive tasks such as data entry, bookkeeping, and routine financial analysis. This technology can also assist in drafting financial reports, reducing the time spent on these activities. However, the need for human oversight in complex decision-making, ethical judgments, and client interactions will remain crucial. Accountants and auditors will increasingly need to develop skills in AI literacy, data interpretation, and strategic advisory to complement AI capabilities. | Accountant |
 
-### Why This Matters for Research
+### Why this matters for research
 
 | Aspect | ChatGPT Website | Our Programmatic Approach |
 |--------|-----------------|---------------------------|
@@ -205,13 +214,13 @@ For scientific research, we want **reproducibility**, so we use 0.
 🔁 **Reproducibility**: Anyone can run the same code, get same results  
 📊 **Structure**: Data goes straight into analysis tools  
 ⚡ **Scale**: 425 API calls while you sleep  
-🔬 **Science**: This is how serious AI research works
 
 ---
 
-## 💰 Cost Calculation: What Does This Cost?
+## 💰 Cost calculation: What does this cost?
 
 Running AI models via API costs money. Here's a breakdown of what to expect.
+Disclaimer: We repeated the runs because a new genAI model from Google was deployed during the ongoing research acitivities. Therefore six models are depicted in the following. Five models are reflected in the associated paper.
 
 ### Number of API Requests
 
@@ -221,7 +230,7 @@ Running AI models via API costs money. Here's a breakdown of what to expect.
 | AI models used | 6 |
 | **Total API calls** | **85 × 6 = 510** |
 
-### Token Usage Per Request (Estimated)
+### Token usage per request (Estimated)
 
 | Type | Tokens | Description |
 |------|--------|-------------|
@@ -230,7 +239,7 @@ Running AI models via API costs money. Here's a breakdown of what to expect.
 | Response output | ~150-300 | The structured JSON response |
 | **Total per request** | **~250-400 tokens** |
 
-### Cost Per Model (Approximate)
+### Cost per model (Approximate)
 
 Prices vary by model and provider. These are **estimates** based on OpenRouter pricing (as of model execution time in 2026):
 
@@ -243,7 +252,7 @@ Prices vary by model and provider. These are **estimates** based on OpenRouter p
 | Grok 4 | $3.00 | $15.00 | ~$1.00 - $2.50 |
 | Cohere Command | $2.50 | $10.00 | ~$0.80 - $1.50 |
 
-### Total Estimated Cost
+### Total estimated cost
 
 | Scenario | Cost |
 |----------|------|
@@ -251,7 +260,7 @@ Prices vary by model and provider. These are **estimates** based on OpenRouter p
 | Only cheap models (Gemini Flash) | ~$0.50 |
 | Only expensive models (GPT-5, Claude) | ~$3 - $5 |
 
-### Cost Formula
+### Cost formula
 
 ```
 Total Cost = (Input Tokens × Input Price) + (Output Tokens × Output Price)
@@ -260,7 +269,7 @@ For 510 calls with ~300 tokens average:
 Total Tokens ≈ 510 × 300 = 153,000 tokens per model
 ```
 
-### Tips to Reduce Costs
+### Tips to reduce costs
 
 - 🧪 **Test with one model first** before running all 6
 - 💨 **Use Gemini Flash** for testing — it's nearly free
@@ -271,7 +280,7 @@ Total Tokens ≈ 510 × 300 = 153,000 tokens per model
 
 ---
 
-## 🏗️ Installation Step by Step
+## 🏗️ Installation step by step
 
 ### Step 1: Install UV
 
@@ -286,7 +295,7 @@ irm https://astral.sh/uv/install.ps1 | iex
 
 3. Close PowerShell and open it again
 
-### Step 2: Prepare the Project
+### Step 2: Prepare the project
 
 1. Open PowerShell
 2. Navigate to the project folder:
@@ -305,7 +314,7 @@ uv sync
 
 ---
 
-## 🔑 Setting Up API Keys
+## 🔑 Setting up API keys
 
 API keys are like passwords that allow the program to communicate with AI services.
 
@@ -332,7 +341,7 @@ LOGFIRE_TOKEN=your_token_here
 
 ---
 
-## 📝 Adding Jobs
+## 📝 Adding jobs
 
 Jobs are listed in the `jobs.txt` file.
 
@@ -354,7 +363,7 @@ Sales Representative
 
 ---
 
-## ▶️ Running the Program
+## ▶️ Running the program
 
 1. Open PowerShell
 2. Navigate to the project folder:
@@ -380,20 +389,20 @@ uv run python -m ai_organizational_changes.main
 
 ---
 
-## 📊 Viewing Results
+## 📊 Viewing results
 
 After the run, you'll find the results in the `results/` folder:
 
 ```
 results/
-├── openai_gpt-5_20260117_130000.json      ← For programmers
-├── openai_gpt-5_20260117_130000.xlsx      ← For Excel fans
+├── openai_gpt-5_20260117_130000.json      ← JSON for programmers
+├── openai_gpt-5_20260117_130000.xlsx      ← Excel for citizen users
 ├── anthropic_claude-4.5_20260117_130100.json
 ├── anthropic_claude-4.5_20260117_130100.xlsx
 └── ... (etc. for each model)
 ```
 
-### Opening the Excel file:
+### Opening the excel file:
 
 You can simply open the `.xlsx` files with Excel. You'll see:
 
@@ -401,7 +410,7 @@ You can simply open the `.xlsx` files with Excel. You'll see:
 |-----|--------------|--------|-------------|
 | Accountant | likely_augmented_with_ai | ["Data entry", "Report creation"] | The accountant will work together with AI... |
 
-### Impact Types Explained:
+### Impact types explained:
 
 | Value | Meaning | Emoji |
 |-------|---------|-------|
@@ -411,7 +420,7 @@ You can simply open the `.xlsx` files with Excel. You'll see:
 
 ---
 
-## 🔧 Changing Models (For Advanced Users)
+## 🔧 Changing models (For advanced users)
 
 If you want to test other AI models, open the file:
 `src/ai_organizational_changes/main.py`
@@ -433,7 +442,7 @@ You can delete or add lines. Search on https://openrouter.ai/models for availabl
 
 ---
 
-## ❓ Common Problems
+## ❓ Common problems
 
 ### "API Key not found"
 → Did you create the `.env` file? Is the correct key in there?
@@ -449,7 +458,7 @@ You can delete or add lines. Search on https://openrouter.ai/models for availabl
 
 ---
 
-## 📁 Project Structure
+## 📁 Project structure
 
 ```
 ai_organizational_changes/
